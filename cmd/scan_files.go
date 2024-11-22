@@ -8,12 +8,13 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var REG *regexp.Regexp
 var OK_COUNT = 0
 
-func ScanFiles(InputFolder string, OutputFolder string) {
+func ScanFiles(InputFolder, OutputFolder, goalDate string) {
 	if !litedir.FileExists(InputFolder) {
 		log.Printf("%s 输入路径不存在: %s", litestr.E(), InputFolder)
 		return
@@ -27,7 +28,12 @@ func ScanFiles(InputFolder string, OutputFolder string) {
 		return
 	}
 	REG = compile
-	readAndQuery(datFolders, OutputFolder, false)
+
+	if goalDate != "" {
+		log.Println("3秒后开始恢复指定年月的数据:" + litestr.ColorString(goalDate, "red"))
+		time.Sleep(time.Second * 3)
+	}
+	readAndQuery(datFolders, OutputFolder, goalDate, false)
 }
 
 func judgeDat(fileName string) bool {
@@ -37,7 +43,7 @@ func judgeDat(fileName string) bool {
 	return true
 }
 
-func readAndQuery(pathName, outFolder string, last bool) {
+func readAndQuery(pathName, outFolder, goalDate string, last bool) {
 	if litedir.IsDir(pathName) {
 		thisDir, err := os.ReadDir(pathName)
 		if err != nil {
@@ -52,6 +58,10 @@ func readAndQuery(pathName, outFolder string, last bool) {
 				}
 				dateFolder := REG.FindString(thisFolder)
 				if dateFolder != "" {
+					if goalDate != "" && dateFolder != goalDate {
+						// 如果传入了指定的年月数据 那么就只跑这个年月的数据
+						continue
+					}
 					saveFolder := path.Join(outFolder, dateFolder)
 					if !litedir.FileExists(saveFolder) {
 						err := os.Mkdir(saveFolder, 0755)
@@ -60,9 +70,9 @@ func readAndQuery(pathName, outFolder string, last bool) {
 						}
 					}
 					// 这个地方的下一级就是需要的文件了
-					readAndQuery(path.Join(pathName, thisFolder), saveFolder, true)
+					readAndQuery(path.Join(pathName, thisFolder), saveFolder, goalDate, true)
 				} else {
-					readAndQuery(path.Join(pathName, thisFolder), outFolder, false)
+					readAndQuery(path.Join(pathName, thisFolder), outFolder, goalDate, false)
 				}
 			} else if last && judgeDat(entry.Name()) {
 				err := ParseAndSave(path.Join(pathName, entry.Name()), outFolder)
