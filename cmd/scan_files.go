@@ -23,13 +23,18 @@ func ScanFiles(InputFolder, OutputFolder, goalDate string) {
 	if litedir.IsDir(InputFolder) {
 		datFolders = path.Join(InputFolder, "MsgAttach")
 	}
-	compile, err := regexp.Compile("\\d{4}-\\d{2}")
+	compile, err := regexp.Compile("^\\d{4}-\\d{2}$")
 	if err != nil {
 		return
 	}
 	REG = compile
 
 	if goalDate != "" {
+		res := REG.FindString(goalDate)
+		if res == "" {
+			log.Println(litestr.E(), "传入了错误的日期格式，请按照 YYYY-mm 的格式，你却输入了:", goalDate)
+			return
+		}
 		log.Println("3秒后开始恢复指定年月的数据:" + litestr.ColorString(goalDate, "red"))
 		time.Sleep(time.Second * 3)
 	}
