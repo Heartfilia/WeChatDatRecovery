@@ -25,6 +25,7 @@ func GetChoice() PathConf {
 	fmt.Println("                +         微信图片恢复工具          +")
 	fmt.Println("                + 传入微信的 FileStorage 文件夹路径 +")
 	fmt.Println("                +     需要指定恢复存放的文件夹      +")
+	fmt.Println("                +          by: Heartfilia           +")
 	fmt.Println("                +-----------------------------------+")
 
 	var p PathConf
