@@ -1,13 +1,13 @@
 package main
 
 import (
-	"WeChatDatRecovery/cmd"
+	"WeChatDatRecovery/core"
 	"fmt"
 )
 
 func main() {
-	path := cmd.GetChoice()
+	path := core.GetChoice()
 	fmt.Println("-----------------------------------------------------")
 
-	cmd.ScanFiles(path.Input, path.Output, path.GoalDate)
+	core.ScanFiles(path.Input, path.Output, path.GoalDate)
 }
